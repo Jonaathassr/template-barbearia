@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbearia Premium</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/CapaAPP.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon1802.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon1802.png">
+  <!-- <link rel="manifest" href="/site.webmanifest"> -->
+
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="theme-black">
+
+  <!-- Header -->
+<header class="header">
+  <div class="logo"><span>Barbearia Premium</span></div>
+  
+  <div class="menu-toggle" id="menu-toggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <nav id="nav-menu">
+    <a href="#home">Início</a>
+    <a href="#servicos">Serviços</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#faq">FAQ</a>
+    <a href="#cortes">Galeria</a>
+    <a href="#contato">Contato</a>
+  </nav>
+</header>
+
+
+  <!-- Hero -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Estilo e Tradição</h1>
+      <p>Transformamos seu visual com cortes clássicos e modernos, em um ambiente exclusivo.</p>
+      <a href="https://wa.me/5599999999999" target="_blank" class="btn btn--dark">Agende pelo WhatsApp</a>
+    </div>
+  </section>
+
+    <!-- Serviços -->
+  <section id="servicos" class="services">
+    <div class="container">
+      <h2>Nossos Serviços</h2>
+      <div class="services-grid">
+        <div class="service-card">
+          <img src="/images/corte.jpg" alt="Corte de cabelo masculino">
+          <h3>Corte de Cabelo</h3>
+          <p>Do clássico ao moderno, cortes que valorizam seu estilo.</p>
+          <span class="price">A partir de R$ 40</span>
+        </div>
+        <div class="service-card">
+          <img src="/images/barba.jpg" alt="Barba alinhada">
+          <h3>Barba</h3>
+          <p>Barba aparada, desenhada e finalizada com produtos premium.</p>
+          <span class="price">A partir de R$ 30</span>
+        </div>
+        <div class="service-card">
+          <img src="/images/combo2.jpg" alt="Cabelo e barba combo">
+          <h3>Combo Cabelo + Barba</h3>
+          <p>O cuidado completo para sair renovado.</p>
+          <span class="price">A partir de R$ 65</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- Tabela de Preços -->
+  <section id="precos" class="pricing">
+    <div class="container">
+      <h2>Valores</h2>
+      <p class="subtitle">Preço justo, estilo garantido.</p>
+      <table class="pricing-table">
+        <tr>
+          <th>Serviço</th>
+          <th>Preço</th>
+        </tr>
+        <tr>
+          <td>Corte Social</td>
+          <td>R$ 35</td>
+        </tr>        
+        <tr>
+          <td>Corte Navalhado</td>
+          <td>R$ 45</td>
+        </tr>
+        <tr>
+          <td>Barba</td>
+          <td>R$ 25</td>
+        </tr>
+        <tr>
+          <td>Sobrancelha</td>
+          <td>R$ 15</td>
+        </tr>
+        <tr>
+          <td>Pigmentação/Coloração</td>
+          <td>R$ 30</td>
+        <tr>
+          <td>Combo 1 - Cabelo + Barba</td>
+          <td>R$ 55</td>
+        </tr>
+        <tr>
+          <td>Combo 2 - Cabelo + Sobrancelha</td>
+          <td>R$ 45</td>
+        </tr>
+        <tr>
+          <td>Combo 3 - Cabelo + Barba + Sobrancelha</td>
+          <td>R$ 70</td>
+        </tr>
+
+        </tr>
+      </table>
+    </div>
+  </section>
+
+    <!-- Sobre -->
+  <section id="sobre" class="about">
+    <div class="container about-container">
+      <div class="about-image">
+        <img src="/images/sobre-barbearia.jpg" alt="Barbeiro trabalhando">
+      </div>
+      <div class="about-text">
+        <h2>Sobre Nós</h2>
+        <p>
+          A <strong>Barbearia Premium</strong> nasceu da paixão por transformar o visual e elevar a autoestima. 
+          Unimos tradição e modernidade em cada corte, com atendimento exclusivo e ambiente sofisticado.
+        </p>
+        <p>
+          Aqui, cada cliente é tratado como parte da família. Seja para um corte clássico, barba desenhada 
+          ou apenas relaxar, você encontra o cuidado que merece.
+        </p>
+        <a href="#contato" class="btn btn--primary">Agende sua visita</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Depoimentos (Scroll-snap, sem JS) -->
+<section id="depoimentos" class="testimonials">
+  <div class="container">
+    <h2>O que dizem nossos clientes</h2>
+    <p class="subtitle">Experiências reais, resultados de verdade.</p>
+
+    <div class="snap-wrap">
+      <div class="snap-scroller">
+        <article class="t-card">
+          <div class="t-stars">
+            ★★★★★
+          </div>
+          <p class="t-quote">“Melhor barbearia da cidade! Atendimento impecável e corte perfeito.”</p>
+          <div class="t-user">
+            <div>
+              <strong>João Martins</strong>
+              <span>Corte & Barba</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="t-card">
+          <div class="t-stars">
+            ★★★★★
+          </div>
+          <p class="t-quote">“Ambiente agradável e barbeiros muito profissionais. Recomendo!”</p>
+          <div class="t-user">
+            <div>
+              <strong>Carlos Eduardo</strong>
+              <span>Barba desenhada</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="t-card">
+          <div class="t-stars">
+            ★★★★★
+          </div>
+          <p class="t-quote">“Experiência incrível! Corte top e ainda relaxei. Vale cada centavo.”</p>
+          <div class="t-user">
+            <div>
+              <strong>Rafael Silva</strong>
+              <span>Combo cabelo + barba</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="t-card">
+          <div class="t-stars">
+            ★★★★★
+          </div>
+          <p class="t-quote">“Detalhistas de verdade. Saí com a autoestima lá em cima.”</p>
+          <div class="t-user">
+            <div>
+              <strong>Lucas Pereira</strong>
+              <span>Sobrancelha + acabamento</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="faq-container">
+    <h2>Perguntas Frequentes</h2>
+    <div class="faq-item">
+      <button class="faq-question">Preciso agendar horário com antecedência?</button>
+      <div class="faq-answer">
+        <p>Sim! Para garantir o melhor atendimento, recomendamos agendar seu corte com pelo menos 1 dia de antecedência.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Vocês aceitam cartão de crédito?</button>
+      <div class="faq-answer">
+        <p>Sim, aceitamos cartões de crédito, débito e Pix.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Posso levar meu filho para cortar o cabelo?</button>
+      <div class="faq-answer">
+        <p>Claro! Atendemos cortes infantis também, sempre com paciência e cuidado.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Quanto tempo dura um corte de cabelo?</button>
+      <div class="faq-answer">
+        <p>Em média, 30 a 40 minutos — mas pode variar de acordo com o estilo escolhido.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Qual é o horário de funcionamento?</button>
+      <div class="faq-answer">
+        <p>Funcionamos de segunda a sábado, das 8h às 18h. Aos domingos e feriados, fechamos para descanso e manutenção do espaço, garantindo sempre um atendimento de qualidade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-particles">
+  <div class="cta-container">
+    <h2>Agende seu horário agora!</h2>
+    <p>Não perca tempo! Garanta seu corte, barba ou sobrancelha com nossos barbeiros profissionais.</p>
+    <a href="https://wa.me/5584999999999" target="_blank" class="btn btn--primary btn--soft">Agendar pelo WhatsApp</a>
+  </div>
+  <canvas id="cta-particles-canvas"></canvas>
+</section>
+
+<section id="cortes" class="gallery-carousel">
+  <div class="container">
+    <h2>Nossos Cortes e Estilos</h2>
+    <p class="subtitle">Confira alguns dos trabalhos que fazem nossos clientes saírem satisfeitos.</p>
+
+    <div class="carousel-wrapper">
+      <div class="carousel-track">
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile1.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile1.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte1.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile2.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile2.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte2.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile3.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile3.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte3.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile4.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile4.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte4.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile7.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile7.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte5.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+
+        <div class="carousel-item">
+          <picture>
+            <!-- Mobile -->
+              <source media="(max-width: 767px)" srcset="/images/corteMobile6.jpg">
+            <!-- Tablet -->
+              <source media="(max-width: 1024px)" srcset="/images/corteMobile6.jpg">
+            <!-- Desktop (default) -->
+              <img src="/images/corte6.jpg" alt="Corte masculino estilo clássico">
+              </picture>
+                </div>
+      </div>
+    </div>
+
+    <div class="carousel-controls">
+      <button id="prev">&#10094;</button>
+      <button id="next">&#10095;</button>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="contato" class="localizacao-section">
+  <div class="localizacao-container">
+    
+    <div class="localizacao-info">
+      <h2>Onde Estamos</h2>
+      <p><i class="fas fa-map-marker-alt"></i> Rua Exemplo, 123 - Centro<br>Cidade/UF</p>
+      <p><i class="fab fa-whatsapp"></i> (99) 9 9999-9999</p>
+      <p><i class="fab fa-instagram"></i> @barbeariaPremium</p>
+      <p><i class="fas fa-envelope"></i> contato@barbearia.com</p>
+    </div>
+
+    <div class="localizacao-mapa">
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d414711.6211034097!2d-46.925650188622186!3d-23.681433120267318!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce448183a461d1%3A0x9ba94b08ff335bae!2zU8OjbyBQYXVsbywgU1A!5e1!3m2!1spt-BR!2sbr!4v1756580754957!5m2!1spt-BR!2sbr" 
+        width="100%" 
+        height="100%" 
+        style="border:0;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="instagram-post-central">
+  <div class="instagram-post-wrapper">
+    <div class="instagram-image">
+      <img src="/images/corteInsta.jpg" alt="Nosso corte do dia">
+    </div>
+    <div class="instagram-text">
+      <h2>Veja nossos cortes no Instagram!</h2>
+      <p>Fotos, novidades e inspirações de estilo todos os dias.<br>Nos acompanhe e não perca nada!</p>
+      <a href="https://instagram.com/seu_instagram" target="_blank" class="btn btn--primary">
+        Seguir no Instagram
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-contact">
+      <h3>Contato</h3>
+      <p><i class="fab fa-whatsapp"></i> (21) 92158-7894</p>
+      <p><i class="fab fa-instagram"></i> @barbeariaPremium</p>
+      <p><i class="fas fa-envelope"></i> contato@barbearia.com</p>
+    </div>
+    <div class="footer-links">
+      <h3>Links</h3>
+      <ul>
+        <li><a href="#home">Início</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#instagram">Instagram</a></li>
+      </ul>
+    </div>
+    <div class="footer-address">
+      <h3>Endereço</h3>
+      <p>Rua Joaquim Menezes, 123 - Centro<br>Limeira/SP</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026  — Barbearia Premium. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>

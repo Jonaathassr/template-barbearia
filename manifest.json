@@ -1,0 +1,19 @@
+{
+  "name": "Barbearia Premium",
+  "short_name": "Barbearia",
+  "icons": [
+    {
+      "src": "/images/capaAPP.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/capaAPP.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#111111",
+  "background_color": "#111111",
+  "display": "standalone"
+}
