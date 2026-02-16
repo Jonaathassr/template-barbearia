@@ -184,6 +184,13 @@ menuToggle.addEventListener("click", () => {
   menuToggle.classList.toggle("active"); // ativa/desativa o "X"
 });
 
+navMenu.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    navMenu.classList.remove("active");
+    menuToggle.classList.remove("active");
+  });
+});
+
 
 // Bloqueia clique com botão direito (desktop)
 document.addEventListener("contextmenu", function(e) {
