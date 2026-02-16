@@ -36,6 +36,26 @@ resizeCanvas();
 
 const particles = [];
 const particleCount = 60;
+const particlesColor = getComputedStyle(document.documentElement)
+  .getPropertyValue("--cta-particles-color")
+  .trim() || "#d4af37";
+
+function hexToRgb(hex) {
+  const clean = hex.replace("#", "").trim();
+  if (clean.length === 3) {
+    const r = clean[0] + clean[0];
+    const g = clean[1] + clean[1];
+    const b = clean[2] + clean[2];
+    return `${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)}`;
+  }
+  if (clean.length === 6) {
+    const r = clean.slice(0, 2);
+    const g = clean.slice(2, 4);
+    const b = clean.slice(4, 6);
+    return `${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)}`;
+  }
+  return "212,175,55";
+}
 
 for (let i = 0; i < particleCount; i++) {
   particles.push({
@@ -62,7 +82,10 @@ function animateParticles() {
 
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(18,85,20,${p.alpha})`; // dourado
+    const rgb = particlesColor.startsWith("#")
+      ? hexToRgb(particlesColor)
+      : particlesColor;
+    ctx.fillStyle = `rgba(${rgb},${p.alpha})`;
     ctx.fill();
   });
 

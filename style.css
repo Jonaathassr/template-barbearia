@@ -13,6 +13,9 @@
   /* Sombras */
   --shadow-card: 0 4px 15px rgba(0,0,0,0.5);
 
+  /* Particulas CTA */
+  --cta-particles-color: #d4af37;
+
   /* Imagens principais */
   --hero-bg-image: url('/images/corteHero.jpg');
   --hero-mobile-image: url('/images/sobre-barbearia.jpg');
@@ -65,7 +68,8 @@ body {
 /* Hero Section */
 .hero {
   position: relative;
-  height: 100vh; /* ocupa toda a tela */
+  min-height: 100vh; /* ocupa toda a tela */
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -820,16 +824,17 @@ body {
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .header nav {
-    position: absolute;
-    top: 70px;
-    right: 0;
+    position: fixed;
+    inset: 0;
     background: var(--color-bg-primary);
     flex-direction: column;
-    width: 240px; /* aumentei antes */
-    padding: 25px;
+    width: 100vw;
+    height: 100vh;
+    padding: 90px 25px 25px;
     display: none;
-    border-radius: 10px 0 0 10px;
+    border-radius: 0;
     box-shadow: -5px 5px 15px rgba(0,0,0,0.6);
+    overflow-y: auto;
   }
 
   .header nav a {
@@ -873,7 +878,8 @@ body {
   .hero {
     /* zera o bg do desktop pra não duplicar camadas */
     background: none !important;
-    height: 100vh;
+    min-height: 100vh;
+    min-height: 100svh;
     width: 100%;
     overflow: hidden; /* evita qualquer scroll lateral durante o zoom */
     position: relative;
@@ -905,6 +911,22 @@ body {
     position: relative; /* garante texto acima das camadas */
     z-index: 2;
     padding: 0 15px;
+  }
+
+  .hero h1 {
+    max-width: 14ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-wrap: balance;
+    font-size: clamp(2.1rem, 9vw, 2.6rem);
+    line-height: 1.1;
+  }
+
+  .hero p {
+    font-size: clamp(0.95rem, 3.6vw, 1.1rem);
+    max-width: 32ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   @keyframes hero-zoom-mobile {
