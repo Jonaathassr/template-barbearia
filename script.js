@@ -24,6 +24,49 @@ document.querySelectorAll(".faq-question").forEach((button) => {
   });
 });
 
+// =======================
+// Status de funcionamento
+// =======================
+const statusBadge = document.getElementById("status-badge");
+
+function formatNextOpenMessage(isOpen, closeHour) {
+  if (isOpen) {
+    return `Aberto agora • Fecha às ${closeHour}h`;
+  }
+  return "Fechado • Abre às 9h";
+}
+
+function updateStatusBadge() {
+  if (!statusBadge) return;
+
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  const currentMinutes = hour * 60 + minute;
+
+  let open = false;
+  let closeHour = 19;
+
+  if (day >= 1 && day <= 5) {
+    open = currentMinutes >= 9 * 60 && currentMinutes < 19 * 60;
+    closeHour = 19;
+  } else if (day === 6) {
+    open = currentMinutes >= 9 * 60 && currentMinutes < 16 * 60;
+    closeHour = 16;
+  } else {
+    open = false;
+    closeHour = 9;
+  }
+
+  statusBadge.textContent = formatNextOpenMessage(open, closeHour);
+  statusBadge.classList.remove("status-badge--open", "status-badge--closed");
+  statusBadge.classList.add(open ? "status-badge--open" : "status-badge--closed");
+}
+
+updateStatusBadge();
+setInterval(updateStatusBadge, 60000);
+
 const canvas = document.getElementById("cta-particles-canvas");
 const ctx = canvas.getContext("2d");
 
@@ -93,6 +136,32 @@ function animateParticles() {
 }
 
 animateParticles();
+
+const mapFrame = document.querySelector(".localizacao-mapa iframe[data-src]");
+if (mapFrame) {
+  const loadMap = () => {
+    const src = mapFrame.getAttribute("data-src");
+    if (src) {
+      mapFrame.setAttribute("src", src);
+      mapFrame.removeAttribute("data-src");
+    }
+  };
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries[0].isIntersecting) {
+          loadMap();
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    observer.observe(mapFrame);
+  } else {
+    loadMap();
+  }
+}
 
 // Carrossel
 const track = document.querySelector('.carousel-track');
@@ -189,6 +258,89 @@ navMenu.querySelectorAll("a").forEach((link) => {
     navMenu.classList.remove("active");
     menuToggle.classList.remove("active");
   });
+});
+
+// =======================
+// Modal WhatsApp
+// =======================
+const modal = document.getElementById("whatsapp-modal");
+const modalClose = modal?.querySelector(".modal__close");
+const modalForm = document.getElementById("whatsapp-form");
+const serviceSelect = document.getElementById("whatsapp-service");
+const dateInput = document.getElementById("whatsapp-date");
+const timeSelect = document.getElementById("whatsapp-time");
+let activeWaLink = null;
+
+function setTodayMinDate() {
+  if (!dateInput) return;
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  const localISO = new Date(now - offset).toISOString().split("T")[0];
+  dateInput.min = localISO;
+  if (!dateInput.value) {
+    dateInput.value = localISO;
+  }
+}
+
+function openModal(link) {
+  if (!modal) return;
+  activeWaLink = link;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  setTodayMinDate();
+}
+
+function closeModal() {
+  if (!modal) return;
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function formatDateBr(value) {
+  const parts = value.split("-");
+  if (parts.length !== 3) return value;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+document.querySelectorAll(".js-whatsapp-modal").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    openModal(link);
+  });
+});
+
+modal?.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    closeModal();
+  }
+});
+
+modalClose?.addEventListener("click", closeModal);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && modal?.getAttribute("aria-hidden") === "false") {
+    closeModal();
+  }
+});
+
+modalForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!serviceSelect.value || !dateInput.value || !timeSelect.value) {
+    return;
+  }
+
+  const service = serviceSelect.value;
+  const date = formatDateBr(dateInput.value);
+  const time = timeSelect.value;
+  const message = `Olá, gostaria de agendar ${service} no dia ${date} às ${time}.`;
+
+  const fallback = "https://wa.me/5588993370497";
+  const waHref = activeWaLink?.getAttribute("href") || fallback;
+  const waUrl = new URL(waHref, window.location.origin);
+  const target = `${waUrl.origin}${waUrl.pathname}?text=${encodeURIComponent(message)}`;
+
+  window.open(target, "_blank");
+  closeModal();
 });
 
 
