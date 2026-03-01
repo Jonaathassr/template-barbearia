@@ -136,6 +136,7 @@ body {
 
 .hero-content {
   z-index: 2; /* mantém texto acima */
+  padding-top: clamp(56px, 8vh, 92px);
 }
 
 .hero h1 {
@@ -261,6 +262,23 @@ body {
   color: var(--color-text-primary);
 }
 
+.modal__form select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 14px;
+}
+
+.modal__form input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .modal {
     padding: 12px;
@@ -308,6 +326,12 @@ body {
     padding: 0 16px;
     border-radius: 14px;
     font-size: 1.03rem;
+  }
+
+  .modal__form select {
+    padding: 0 44px 0 16px;
+    background-position: right 14px center;
+    background-size: 15px;
   }
 
   .modal__form .btn {
@@ -1088,7 +1112,7 @@ body {
   .hero-content {
     position: relative; /* garante texto acima das camadas */
     z-index: 2;
-    padding: 0 15px;
+    padding: clamp(62px, 9vh, 98px) 15px 0;
   }
 
   .hero .status-badge {
@@ -1168,7 +1192,7 @@ body {
     pointer-events: none;
   }
 
-  .hero-content { position: relative; z-index: 2; padding: 0 24px; }
+  .hero-content { position: relative; z-index: 2; padding: clamp(58px, 8.5vh, 94px) 24px 0; }
 
   .hero .status-badge {
     margin-bottom: 18px;

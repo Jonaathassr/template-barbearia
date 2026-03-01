@@ -29,39 +29,35 @@ document.querySelectorAll(".faq-question").forEach((button) => {
 // =======================
 const statusBadge = document.getElementById("status-badge");
 
-function formatNextOpenMessage(isOpen, closeHour) {
-  if (isOpen) {
-    return `Aberto agora • Fecha às ${closeHour}h`;
-  }
-  return "Fechado • Abre às 9h";
-}
-
 function updateStatusBadge() {
   if (!statusBadge) return;
 
   const now = new Date();
-  const day = now.getDay();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  const currentMinutes = hour * 60 + minute;
+  const day = now.getDay(); // 0 = domingo, 1 = segunda, ...
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const openMinutes = 9 * 60;
+  const closeMinutes = 18 * 60;
+  const isSunday = day === 0;
+  const isOpen = !isSunday && currentMinutes >= openMinutes && currentMinutes < closeMinutes;
 
-  let open = false;
-  let closeHour = 19;
+  let message = "";
 
-  if (day >= 1 && day <= 5) {
-    open = currentMinutes >= 9 * 60 && currentMinutes < 19 * 60;
-    closeHour = 19;
-  } else if (day === 6) {
-    open = currentMinutes >= 9 * 60 && currentMinutes < 16 * 60;
-    closeHour = 16;
+  if (isOpen) {
+    message = "Aberto • Fecha às 18h";
+  } else if (isSunday) {
+    message = "Fechado • Abre Segunda às 09h";
+  } else if (currentMinutes < openMinutes) {
+    message = "Fechado • Abre às 09h";
   } else {
-    open = false;
-    closeHour = 9;
+    const tomorrow = (day + 1) % 7;
+    message = tomorrow === 0
+      ? "Fechado • Abre Segunda às 09h"
+      : "Fechado • Abre amanhã às 09h";
   }
 
-  statusBadge.textContent = formatNextOpenMessage(open, closeHour);
+  statusBadge.textContent = message;
   statusBadge.classList.remove("status-badge--open", "status-badge--closed");
-  statusBadge.classList.add(open ? "status-badge--open" : "status-badge--closed");
+  statusBadge.classList.add(isOpen ? "status-badge--open" : "status-badge--closed");
 }
 
 updateStatusBadge();
@@ -263,23 +259,281 @@ navMenu.querySelectorAll("a").forEach((link) => {
 // =======================
 // Modal WhatsApp
 // =======================
+const GOOGLE_API_KEY = "AIzaSyB_iqfhsqfkDkGMcPWYJC_53DmHJw6JUE4";
+const GOOGLE_CALENDAR_ID = "e680e3e4e2c2d89c8f4536df82e373335bc5d192b3b9aa9d2a20140dcda1c601@group.calendar.google.com";
+
+
+const BARBER_START_HOUR = 9;
+const BARBER_END_HOUR = 18;
+const SLOT_INTERVAL_HOURS = 1;
+
 const modal = document.getElementById("whatsapp-modal");
 const modalClose = modal?.querySelector(".modal__close");
 const modalForm = document.getElementById("whatsapp-form");
 const serviceSelect = document.getElementById("whatsapp-service");
 const dateInput = document.getElementById("whatsapp-date");
 const timeSelect = document.getElementById("whatsapp-time");
+const submitButton = modalForm?.querySelector('button[type="submit"]');
 let activeWaLink = null;
+let availabilityRequestId = 0;
+let lastLoadedDate = "";
+
+function isGoogleCalendarConfigured() {
+  return Boolean(GOOGLE_API_KEY && GOOGLE_CALENDAR_ID);
+}
+
+function getBaseTimeSlots() {
+  const slots = [];
+  for (let hour = BARBER_START_HOUR; hour < BARBER_END_HOUR; hour += SLOT_INTERVAL_HOURS) {
+    slots.push(`${String(hour).padStart(2, "0")}:00`);
+  }
+  return slots;
+}
+
+function clearTimeSelectWithPlaceholder(text = "Selecione o horario") {
+  if (!timeSelect) return;
+  timeSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = text;
+  placeholder.selected = true;
+  timeSelect.appendChild(placeholder);
+}
+
+function populateTimeSelect(times) {
+  if (!timeSelect) return;
+  clearTimeSelectWithPlaceholder("Selecione o horario");
+
+  times.forEach((time) => {
+    const option = document.createElement("option");
+    option.value = time;
+    option.textContent = time;
+    timeSelect.appendChild(option);
+  });
+
+  timeSelect.disabled = false;
+}
+
+function setNoAvailabilityState() {
+  if (!timeSelect) return;
+  clearTimeSelectWithPlaceholder("Não há horários disponíveis para esta data.");
+  timeSelect.disabled = true;
+}
+
+function setSubmitEnabled(enabled) {
+  if (!submitButton) return;
+  submitButton.disabled = !enabled;
+}
+
+function getDayRangeInIso(selectedDateValue) {
+  const [year, month, day] = selectedDateValue.split("-").map(Number);
+  const dayStartLocal = new Date(year, month - 1, day, 0, 0, 0, 0);
+  const dayEndLocal = new Date(year, month - 1, day, 23, 59, 59, 999);
+  return {
+    timeMin: dayStartLocal.toISOString(),
+    timeMax: dayEndLocal.toISOString()
+  };
+}
+
+function dateToIsoDay(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function extractOccupiedSlots(events, selectedDateValue) {
+  const occupied = new Set();
+
+  events.forEach((eventItem) => {
+    if (eventItem?.status !== "confirmed") return;
+    const dateTime = eventItem?.start?.dateTime;
+    if (!dateTime) return;
+
+    const startDate = new Date(dateTime);
+    if (Number.isNaN(startDate.getTime())) return;
+    if (dateToIsoDay(startDate) !== selectedDateValue) return;
+
+    const hourSlot = `${String(startDate.getHours()).padStart(2, "0")}:00`;
+    occupied.add(hourSlot);
+  });
+
+  return occupied;
+}
+
+async function fetchCalendarEventsForDate(selectedDateValue) {
+  const { timeMin, timeMax } = getDayRangeInIso(selectedDateValue);
+  const calendarIdEncoded = encodeURIComponent(GOOGLE_CALENDAR_ID);
+  const endpoint = `https://www.googleapis.com/calendar/v3/calendars/${calendarIdEncoded}/events`;
+
+  const params = new URLSearchParams({
+    key: GOOGLE_API_KEY,
+    timeMin,
+    timeMax,
+    singleEvents: "true",
+    orderBy: "startTime",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
+
+  const response = await fetch(`${endpoint}?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`Google Calendar API retornou ${response.status}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data.items) ? data.items : [];
+}
+
+async function updateAvailableTimesForDate(selectedDateValue) {
+  if (!timeSelect || !selectedDateValue) return;
+
+  const requestId = ++availabilityRequestId;
+  const baseSlots = getBaseTimeSlots();
+
+  if (!isGoogleCalendarConfigured()) {
+    populateTimeSelect(baseSlots);
+    setSubmitEnabled(true);
+    lastLoadedDate = selectedDateValue;
+    return;
+  }
+
+  clearTimeSelectWithPlaceholder("Carregando horários...");
+  timeSelect.disabled = true;
+  setSubmitEnabled(false);
+
+  try {
+    const events = await fetchCalendarEventsForDate(selectedDateValue);
+    if (requestId !== availabilityRequestId) return;
+
+    const occupiedSlots = extractOccupiedSlots(events, selectedDateValue);
+    const availableSlots = baseSlots.filter((slot) => !occupiedSlots.has(slot));
+
+    if (availableSlots.length === 0) {
+      setNoAvailabilityState();
+      setSubmitEnabled(false);
+    } else {
+      populateTimeSelect(availableSlots);
+      setSubmitEnabled(true);
+    }
+
+    lastLoadedDate = selectedDateValue;
+  } catch (error) {
+    if (requestId !== availabilityRequestId) return;
+    console.error("Falha ao consultar Google Calendar:", error);
+    populateTimeSelect(baseSlots);
+    setSubmitEnabled(true);
+    lastLoadedDate = selectedDateValue;
+  }
+}
+
+const FIXED_HOLIDAYS_BR = new Set([
+  "01-01", // Confraternização Universal
+  "04-21", // Tiradentes
+  "05-01", // Dia do Trabalho
+  "09-07", // Independência
+  "10-12", // Nossa Senhora Aparecida
+  "11-02", // Finados
+  "11-15", // Proclamação da República
+  "11-20", // Consciência Negra
+  "12-25"  // Natal
+]);
+
+function getEasterDate(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+function addDays(date, amount) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + amount);
+  return result;
+}
+
+function toMonthDay(date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}-${day}`;
+}
+
+function isHolidayDate(date) {
+  const easter = getEasterDate(date.getFullYear());
+  const goodFriday = addDays(easter, -2);
+  const corpusChristi = addDays(easter, 60);
+  const holidayTimestamps = new Set([
+    goodFriday.setHours(0, 0, 0, 0),
+    corpusChristi.setHours(0, 0, 0, 0)
+  ]);
+
+  const current = new Date(date);
+  current.setHours(0, 0, 0, 0);
+
+  return FIXED_HOLIDAYS_BR.has(toMonthDay(current)) || holidayTimestamps.has(current.getTime());
+}
+
+function isClosedDate(date) {
+  return date.getDay() === 0 || isHolidayDate(date);
+}
 
 function setTodayMinDate() {
   if (!dateInput) return;
   const now = new Date();
-  const offset = now.getTimezoneOffset() * 60000;
-  const localISO = new Date(now - offset).toISOString().split("T")[0];
-  dateInput.min = localISO;
-  if (!dateInput.value) {
-    dateInput.value = localISO;
+  const minDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  while (isClosedDate(minDate)) {
+    minDate.setDate(minDate.getDate() + 1);
   }
+
+  const minISO = formatDateToISO(minDate);
+  dateInput.min = minISO;
+
+  if (!dateInput.value) {
+    dateInput.value = minISO;
+  }
+}
+
+function formatDateToISO(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseDateInputValue(value) {
+  if (!value) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function validateDateIsOpenDay(showAlert = false) {
+  if (!dateInput || !dateInput.value) return true;
+
+  const selectedDate = parseDateInputValue(dateInput.value);
+  if (!selectedDate) return true;
+  if (!isClosedDate(selectedDate)) return true;
+
+  if (showAlert) {
+    const isSunday = selectedDate.getDay() === 0;
+    const message = isSunday
+      ? "Domingo é dia fechado. Selecione uma data de segunda a sábado."
+      : "Essa data é feriado e a barbearia estará fechada. Escolha outro dia.";
+    window.alert(message);
+  }
+
+  dateInput.value = "";
+  dateInput.focus();
+  return false;
 }
 
 function openModal(link) {
@@ -288,6 +542,8 @@ function openModal(link) {
   modal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
   setTodayMinDate();
+  clearTimeSelectWithPlaceholder("Selecione o horario");
+  setSubmitEnabled(true);
 }
 
 function closeModal() {
@@ -309,6 +565,18 @@ document.querySelectorAll(".js-whatsapp-modal").forEach((link) => {
   });
 });
 
+dateInput?.addEventListener("change", () => {
+  if (!validateDateIsOpenDay(true)) {
+    clearTimeSelectWithPlaceholder("Selecione o horario");
+    timeSelect.disabled = false;
+    setSubmitEnabled(false);
+    lastLoadedDate = "";
+    return;
+  }
+
+  updateAvailableTimesForDate(dateInput.value);
+});
+
 modal?.addEventListener("click", (event) => {
   if (event.target === modal) {
     closeModal();
@@ -323,9 +591,21 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-modalForm?.addEventListener("submit", (event) => {
+modalForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!serviceSelect.value || !dateInput.value || !timeSelect.value) {
+    return;
+  }
+
+  if (!validateDateIsOpenDay(true)) {
+    return;
+  }
+
+  if (lastLoadedDate !== dateInput.value) {
+    await updateAvailableTimesForDate(dateInput.value);
+  }
+
+  if (!timeSelect.value || timeSelect.disabled) {
     return;
   }
 
