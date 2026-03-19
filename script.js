@@ -404,7 +404,18 @@ async function updateAvailableTimesForDate(selectedDateValue) {
     if (requestId !== availabilityRequestId) return;
 
     const occupiedSlots = extractOccupiedSlots(events, selectedDateValue);
-    const availableSlots = baseSlots.filter((slot) => !occupiedSlots.has(slot));
+    let availableSlots = baseSlots.filter((slot) => !occupiedSlots.has(slot));
+
+    // Remove horários já passados para o dia atual (calendário local)
+    const today = new Date();
+    const selectedDate = parseDateInputValue(selectedDateValue);
+    if (selectedDate && selectedDate.toDateString() === today.toDateString()) {
+      const currentHour = today.getHours();
+      availableSlots = availableSlots.filter((slot) => {
+        const slotHour = Number(slot.split(":")[0]);
+        return slotHour > currentHour;
+      });
+    }
 
     if (availableSlots.length === 0) {
       setNoAvailabilityState();
